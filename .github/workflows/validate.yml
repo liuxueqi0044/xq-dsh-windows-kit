@@ -25,10 +25,17 @@ jobs:
           python-version: '3.13'
       - name: Install exact schema validator
         shell: powershell
-        run: python -m pip install --disable-pip-version-check --no-cache-dir jsonschema==4.25.1
+        run: |
+          for ($attempt = 1; $attempt -le 3; $attempt++) {
+            python -m pip install --disable-pip-version-check --no-cache-dir jsonschema==4.25.1
+            if ($LASTEXITCODE -eq 0) { break }
+            if ($attempt -eq 3) { throw 'Unable to install jsonschema==4.25.1 after 3 attempts.' }
+            Start-Sleep -Seconds (5 * $attempt)
+          }
       - name: Install exact Pester
         shell: powershell
-        run: Install-Module Pester -RequiredVersion 3.4.0 -Scope CurrentUser -Force -Repository PSGallery -ErrorAction Stop
+        # Hosted runners include signed Pester 5; reviewed Pester 3.4.0 predates catalog signing.
+        run: Install-Module Pester -RequiredVersion 3.4.0 -Scope CurrentUser -Force -SkipPublisherCheck -Repository PSGallery -ErrorAction Stop
       - name: Run validation suite (no network resolver or candidate build)
         shell: powershell
         run: .\tests\Invoke-Tests.ps1 -Mode Validate -SummaryPath .\tests\results\validate-powershell.json
@@ -60,10 +67,17 @@ jobs:
           python-version: '3.13'
       - name: Install exact schema validator
         shell: pwsh
-        run: python -m pip install --disable-pip-version-check --no-cache-dir jsonschema==4.25.1
+        run: |
+          for ($attempt = 1; $attempt -le 3; $attempt++) {
+            python -m pip install --disable-pip-version-check --no-cache-dir jsonschema==4.25.1
+            if ($LASTEXITCODE -eq 0) { break }
+            if ($attempt -eq 3) { throw 'Unable to install jsonschema==4.25.1 after 3 attempts.' }
+            Start-Sleep -Seconds (5 * $attempt)
+          }
       - name: Install exact Pester
         shell: pwsh
-        run: Install-Module Pester -RequiredVersion 3.4.0 -Scope CurrentUser -Force -Repository PSGallery -ErrorAction Stop
+        # Hosted runners include signed Pester 5; reviewed Pester 3.4.0 predates catalog signing.
+        run: Install-Module Pester -RequiredVersion 3.4.0 -Scope CurrentUser -Force -SkipPublisherCheck -Repository PSGallery -ErrorAction Stop
       - name: Run validation suite (no network resolver or candidate build)
         shell: pwsh
         run: .\tests\Invoke-Tests.ps1 -Mode Validate -SummaryPath .\tests\results\validate-pwsh.json

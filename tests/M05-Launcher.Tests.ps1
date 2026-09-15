@@ -66,14 +66,25 @@ exit $LASTEXITCODE
     return @($arguments)
   }
 
+  function Get-XQDSHProcessIds {
+    # GitHub runners can start unrelated npx processes between snapshots. Limit
+    # the assertion to a process whose command line identifies this DSH launch.
+    return @(Get-CimInstance -ClassName Win32_Process -ErrorAction SilentlyContinue |
+      Where-Object {
+        $_.Name -match '^(?i)(node|npm|npx|dsh)(\.exe)?$' -and
+        $_.CommandLine -match '(?i)(@deepseek-ai[\\/]dsh|XQ-DSH-Safe\.patch\.yml)'
+      } |
+      Select-Object -ExpandProperty ProcessId)
+  }
+
   $whatIfPath = Join-Path ([IO.Path]::GetTempPath()) ('xq-m05-whatif-' + [guid]::NewGuid().ToString('N'))
   $manifest = Join-Path $Root 'manifest\product-manifest.json'
-  $before = @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -match '^(npx|dsh)$' } | Select-Object -ExpandProperty Id)
+  $before = @(Get-XQDSHProcessIds)
   try {
     $whatIfArguments = @(Get-XQLauncherArguments -Workspace $whatIfPath -ManifestPath $manifest -DryRun)
     $out = @(& powershell.exe @whatIfArguments 2>&1)
     $code = $LASTEXITCODE
-    $after = @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -match '^(npx|dsh)$' } | Select-Object -ExpandProperty Id)
+    $after = @(Get-XQDSHProcessIds)
     $new = @($after | Where-Object { $before -notcontains $_ })
     Check 'RUN-004' (($code -eq 0) -and ($new.Count -eq 0) -and (($out -join "`n") -match '(?i)(what.?if|plan|would)')) 'WhatIf succeeded with a plan and no DSH/npx process' 'WhatIf did not produce a safe plan or spawned a process'
   } catch { Add-Result 'RUN-004' 'FAIL' ('WhatIf invocation failed: ' + $_.Exception.Message) }

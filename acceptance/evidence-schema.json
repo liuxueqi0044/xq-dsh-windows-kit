@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xq.invalid/schemas/vm-evidence-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "suiteId", "status", "environment", "product", "startedAtUtc", "endedAtUtc", "executor", "reviewer", "privacyAttestation", "items"],
+  "properties": {
+    "$schema": { "const": "../evidence-schema.json" },
+    "schemaVersion": { "const": "1" },
+    "suiteId": { "enum": ["vm-zh", "vm-en"] },
+    "status": { "enum": ["PASS", "FAIL", "PENDING"] },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vmId", "locale", "osCaption", "osBuild", "architecture", "snapshotId", "isolated"],
+      "properties": {
+        "vmId": { "type": "string", "minLength": 1 },
+        "locale": { "enum": ["zh-CN", "en-US"] },
+        "osCaption": { "type": "string", "minLength": 1 },
+        "osBuild": { "type": "string", "minLength": 1 },
+        "architecture": { "const": "x64" },
+        "snapshotId": { "type": "string", "minLength": 1 },
+        "isolated": { "type": "boolean" }
+      }
+    },
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["productVersion", "dshVersion", "candidateZipSha256"],
+      "properties": {
+        "productVersion": { "const": "1.0.0" },
+        "dshVersion": { "const": "0.1.1-rc.2" },
+        "candidateZipSha256": { "type": ["null", "string"], "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "startedAtUtc": { "type": ["null", "string"], "format": "date-time" },
+    "endedAtUtc": { "type": ["null", "string"], "format": "date-time" },
+    "executor": { "type": ["null", "string"], "minLength": 1 },
+    "reviewer": { "type": ["null", "string"], "minLength": 1 },
+    "privacyAttestation": { "type": "boolean" },
+    "items": {
+      "type": "array",
+      "minItems": 14,
+      "maxItems": 14,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "expected", "actual", "command", "evidenceHashes", "evidenceFiles", "notes"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^VM-(00[1-9]|01[0-4])$" },
+          "status": { "enum": ["PASS", "FAIL", "PENDING"] },
+          "expected": { "type": "string", "minLength": 1 },
+          "actual": { "type": ["null", "string"] },
+          "command": { "type": ["null", "string"] },
+          "evidenceHashes": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+          "evidenceFiles": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$" } },
+          "notes": { "type": "string" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "status": { "const": "PASS" } }, "required": ["status"] },
+            "then": {
+              "properties": {
+                "actual": { "type": "string", "minLength": 1 },
+                "command": { "type": "string", "minLength": 1 },
+                "evidenceHashes": { "minItems": 1 },
+                "evidenceFiles": { "minItems": 1 }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "PASS" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "environment": { "properties": { "isolated": { "const": true } } },
+          "product": { "properties": { "candidateZipSha256": { "type": "string" } } },
+          "startedAtUtc": { "type": "string" },
+          "endedAtUtc": { "type": "string" },
+          "executor": { "type": "string" },
+          "reviewer": { "type": "string" },
+          "privacyAttestation": { "const": true }
+        }
+      }
+    }
+  ]
+}

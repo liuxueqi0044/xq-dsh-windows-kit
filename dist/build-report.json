@@ -1,0 +1,1 @@
+{"schemaVersion":"1","tool":"Build-Package.ps1","powershellVersion":"5.1.26100.9168","inputCommit":"UNAVAILABLE","gates":{"manifest":"PASS","layout":"PASS","offlineContent":"PASS","sensitiveScan":"PASS","preBuild":"NOT_SUPPLIED","m11":"PENDING"},"buildKind":"development"}

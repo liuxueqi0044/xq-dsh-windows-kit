@@ -1,0 +1,9 @@
+{
+  "$schema": "../schemas/trusted-sources.schema.json",
+  "npmRegistry": "https://registry.npmjs.org/",
+  "officialHosts": ["registry.npmjs.org", "github.com", "raw.githubusercontent.com"],
+  "packageName": "@deepseek-ai/dsh",
+  "repository": "deepseek-ai/deepseek-harness",
+  "tagPattern": "^dsh-v0\\.1\\.1-rc\\.2$",
+  "allowRedirects": false
+}

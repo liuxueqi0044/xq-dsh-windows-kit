@@ -1,0 +1,167 @@
+{
+  "$schema": "../evidence-schema.json",
+  "schemaVersion": "1",
+  "suiteId": "vm-zh",
+  "status": "PENDING",
+  "environment": {
+    "vmId": "PENDING",
+    "locale": "zh-CN",
+    "osCaption": "PENDING",
+    "osBuild": "PENDING",
+    "architecture": "x64",
+    "snapshotId": "PENDING",
+    "isolated": false
+  },
+  "product": {
+    "productVersion": "1.0.0",
+    "dshVersion": "0.1.1-rc.2",
+    "candidateZipSha256": null
+  },
+  "startedAtUtc": null,
+  "endedAtUtc": null,
+  "executor": null,
+  "reviewer": null,
+  "privacyAttestation": false,
+  "items": [
+    {
+      "id": "VM-001",
+      "status": "PENDING",
+      "expected": "中文和英文 VM 具有独立证据",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-002",
+      "status": "PENDING",
+      "expected": "干净 Windows 11 x64 与受支持 Node 流程通过",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-003",
+      "status": "PENDING",
+      "expected": "锁定 DSH 从官方来源启动",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-004",
+      "status": "PENDING",
+      "expected": "首次工作区为空且为安全窄目录",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-005",
+      "status": "PENDING",
+      "expected": "临时 Key 仅由验收者输入且证据无明文",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-006",
+      "status": "PENDING",
+      "expected": "workspace-write 与 ask 下完成低风险读写",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-007",
+      "status": "PENDING",
+      "expected": "3080 仅监听 127.0.0.1 并记录 IPv4/IPv6",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-008",
+      "status": "PENDING",
+      "expected": "重启后数据行为符合指南",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-009",
+      "status": "PENDING",
+      "expected": "API、端口、网络和下载失败结果友好",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-010",
+      "status": "PENDING",
+      "expected": "测试 Skill 安装、发现、调用和删除通过",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-011",
+      "status": "PENDING",
+      "expected": "测试插件安装、验证、删除和回滚通过",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-012",
+      "status": "PENDING",
+      "expected": "诊断报告自动和人工扫描无秘密",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-013",
+      "status": "PENDING",
+      "expected": "最终 ZIP 扫描、hash 和文件清单一致",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-014",
+      "status": "PENDING",
+      "expected": "商品文案、售后边界和已知问题通过人工复核",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    }
+  ]
+}

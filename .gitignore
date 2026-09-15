@@ -1,0 +1,10 @@
+# Generated local test and staging evidence
+tests/results/
+*.tmp
+*.temp
+
+# Editor and operating-system noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

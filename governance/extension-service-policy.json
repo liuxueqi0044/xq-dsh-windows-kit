@@ -1,0 +1,6 @@
+{
+  "$schema": "../schemas/extension-service-policy.schema.json",
+  "defaultDisposition": "deny", "operatorOnly": true,
+  "blockedConditions": ["git-source", "unknown-lifecycle-script", "native-binary", "browser-driver", "background-service", "oauth", "paid-api", "allowBuilds"],
+  "requiredChecks": ["exact-version", "tarball", "integrity", "package-scripts", "license", "backup", "rollback"]
+}

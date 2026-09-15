@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "suite": "M10",
+  "required": true,
+  "cases": {
+    "TST-001": ["M01-Governance.Tests.ps1", "M02-SupplyChain.Tests.ps1", "M03-Common.Tests.ps1", "M04-Environment.Tests.ps1", "M05-Launcher.Tests.ps1", "M06-Diagnostics.Tests.ps1", "M07-OfflineContent.Tests.ps1", "M08-Extensions.Tests.ps1", "M09-Packaging.Tests.ps1", "M10-CI.Tests.ps1"],
+    "TST-002": ["M01-Governance.Tests.ps1"], "TST-003": ["M02-SupplyChain.Tests.ps1"], "TST-004": ["M03-Common.Tests.ps1", "M05-Launcher.Tests.ps1"], "TST-005": ["M03-Common.Tests.ps1", "M05-Launcher.Tests.ps1"], "TST-006": ["M07-OfflineContent.Tests.ps1"], "TST-007": ["M02-SupplyChain.Tests.ps1"], "TST-008": ["M06-Diagnostics.Tests.ps1"], "TST-009": ["M04-Environment.Tests.ps1", "M05-Launcher.Tests.ps1"], "TST-010": ["M08-Extensions.Tests.ps1"], "TST-011": ["M08-Extensions.Tests.ps1"], "TST-012": ["M08-Extensions.Tests.ps1"], "TST-013": ["Invoke-Tests.ps1"], "TST-014": ["Invoke-Tests.ps1"], "TST-015": ["build-candidate.yml"], "TST-016": ["Invoke-Tests.ps1"],
+    "M09": ["M09-Packaging.Tests.ps1"], "M10": ["M10-CI.Tests.ps1"]
+  }
+}

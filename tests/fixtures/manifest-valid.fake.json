@@ -1,0 +1,8 @@
+{
+  "$schema": "../schemas/product-manifest.schema.json",
+  "product": { "name": "XQ DSH Windows Kit", "version": "1.0.0", "brandClaimsVersion": "1" },
+  "upstream": { "packageName": "@deepseek-ai/dsh", "version": "0.1.1-rc.2", "registry": "https://registry.npmjs.org/", "tarball": "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.1-rc.2.tgz", "integrity": "sha512-UP1UIh6q3Gme/yXRn/QL2P8IsVlv8Shpg22TRJIZPsCRWLm4CBiA1MUvXmJAfsOEETBMLAl+xWPtFw6ICsN3wg==", "sha256": "47ec05f45ada5ab87779ae18a90456b5ebff5421dc0ff5c179677d65e1c16057", "git": { "repository": "https://github.com/deepseek-ai/deepseek-harness.git", "tag": "dsh-v0.1.1-rc.2", "commit": "b150a551b8d465e31e418e1b2eaf5e79bbb7d28e" }, "license": { "spdx": "MIT", "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/dsh-v0.1.1-rc.2/LICENSE", "sha256": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be" } },
+  "runtime": { "operatingSystem": "Windows 11", "architecture": "x64", "nodeRange": ">=22.19.0 <23.0.0 || >=24.0.0 <25.0.0", "webHost": "127.0.0.1", "webPort": 3080, "sandbox": "workspace-write", "approval": "ask" },
+  "privacy": { "xqTelemetry": false, "diagnosticsUpload": false, "sessionUpload": false },
+  "release": { "state": "draft", "lockedAtUtc": "2099-01-01T00:00:00Z", "requiredGates": [], "approvalReference": null, "gateEvidence": null }
+}

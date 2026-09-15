@@ -1,0 +1,49 @@
+name: Build candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type BUILD-CANDIDATE to authorize online resolution and full gates
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    if: ${{ inputs.confirm == 'BUILD-CANDIDATE' }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        # v6.0.2 (de0fac2e4500dabe0009e67214ff5f5447ce83dd)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Set up Python
+        # v7.0.0 (5fda3b95a4ea91299a34e894583c3862153e4b97); no dependency cache.
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Install exact schema validator
+        shell: pwsh
+        run: python -m pip install --disable-pip-version-check --no-cache-dir jsonschema==4.25.1
+      - name: Install exact Pester
+        shell: pwsh
+        run: Install-Module Pester -RequiredVersion 3.4.0 -Scope CurrentUser -Force -Repository PSGallery -ErrorAction Stop
+      - name: Run complete candidate gates
+        shell: pwsh
+        run: .\tests\Invoke-Tests.ps1 -Mode Candidate -SummaryPath .\tests\results\candidate-summary.json
+      - name: Require candidate summary
+        if: always()
+        shell: pwsh
+        run: if (-not (Test-Path .\tests\results\candidate-summary.json)) { throw 'Candidate summary is missing' }
+      - name: Upload candidate evidence
+        if: always()
+        # v7.0.1 (043fb46d1a93c77aae656e7c1c64a875d1fc6a0a)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: m10-candidate-evidence
+          path: |
+            dist/**
+            tests/results/**
+          if-no-files-found: error

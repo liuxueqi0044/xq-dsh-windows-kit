@@ -1,0 +1,10 @@
+{
+  "latest": { "upstream": { "version": "latest" } },
+  "wrongPackage": { "upstream": { "packageName": "evil/dsh" } },
+  "wrongRegistry": { "upstream": { "registry": "https://registry.example.invalid/" } },
+  "wrongHost": { "runtime": { "webHost": "0.0.0.0" } },
+  "dangerousPermission": { "runtime": { "sandbox": "danger-full-access", "approval": "never" } },
+  "wrongIntegrity": { "upstream": { "integrity": "sha512-bad" } },
+  "wrongSha": { "upstream": { "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" } },
+  "commandInjection": { "workspacePath": "C:\\Temp\\safe; Write-Host INJECTED; #", "package": "@deepseek-ai/dsh`\"; Write-Host INJECTED; #" }
+}

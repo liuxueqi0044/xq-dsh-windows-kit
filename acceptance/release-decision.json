@@ -1,0 +1,15 @@
+{
+  "$schema": "release-decision.schema.json",
+  "schemaVersion": "1",
+  "status": "PENDING",
+  "candidateZipSha256": null,
+  "automatedM01M10": { "status": "PENDING", "reference": null },
+  "githubMainValidate": { "status": "PENDING", "reference": null },
+  "upstreamObservation": { "status": "PENDING", "reference": null },
+  "vmZh": { "status": "PENDING", "reference": null },
+  "vmEn": { "status": "PENDING", "reference": null },
+  "executor": null,
+  "reviewer": null,
+  "decidedAtUtc": null,
+  "reasons": ["实现完成但外部 VM/main/人工证据未完成"]
+}

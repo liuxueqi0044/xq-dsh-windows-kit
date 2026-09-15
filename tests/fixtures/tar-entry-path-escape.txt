@@ -1,0 +1,3 @@
+package/README.md
+package/../outside.txt
+package/LICENSE

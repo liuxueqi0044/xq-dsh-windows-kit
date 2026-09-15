@@ -1,0 +1,1 @@
+{"name":"fixture-script","version":"1.2.3","license":"MIT","scripts":{"postinstall":"node setup.js"}}

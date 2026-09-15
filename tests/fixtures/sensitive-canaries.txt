@@ -1,0 +1,4 @@
+Authorization: Bearer FAKE_TEST_BEARER_NOT_REAL
+api_key=sk-FAKE_TEST_KEY_NOT_REAL
+token=eyJmYWtlIjoiY2FuYXJ5In0.eyJub3QiOiJyZWFsIn0.FAKE_SIGNATURE
+https://user:FAKE_PASSWORD@example.invalid/?secret=FAKE_SECRET

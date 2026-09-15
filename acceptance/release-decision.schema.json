@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "status", "candidateZipSha256", "automatedM01M10", "githubMainValidate", "upstreamObservation", "vmZh", "vmEn", "executor", "reviewer", "decidedAtUtc", "reasons"],
+  "properties": {
+    "$schema": { "const": "release-decision.schema.json" },
+    "schemaVersion": { "const": "1" },
+    "status": { "enum": ["PASS", "FAIL", "PENDING"] },
+    "candidateZipSha256": { "type": ["null", "string"], "pattern": "^[a-f0-9]{64}$" },
+    "automatedM01M10": { "$ref": "#/$defs/gate" },
+    "githubMainValidate": { "$ref": "#/$defs/gate" },
+    "upstreamObservation": { "$ref": "#/$defs/gate" },
+    "vmZh": { "$ref": "#/$defs/gate" },
+    "vmEn": { "$ref": "#/$defs/gate" },
+    "executor": { "type": ["null", "string"], "minLength": 1 },
+    "reviewer": { "type": ["null", "string"], "minLength": 1 },
+    "decidedAtUtc": { "type": ["null", "string"], "format": "date-time" },
+    "reasons": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "PASS" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "candidateZipSha256": { "type": "string" },
+          "executor": { "type": "string" },
+          "reviewer": { "type": "string" },
+          "decidedAtUtc": { "type": "string" },
+          "reasons": { "minItems": 1 },
+          "automatedM01M10": { "$ref": "#/$defs/passedGate" },
+          "githubMainValidate": { "$ref": "#/$defs/passedGate" },
+          "upstreamObservation": { "$ref": "#/$defs/passedGate" },
+          "vmZh": { "$ref": "#/$defs/passedGate" },
+          "vmEn": { "$ref": "#/$defs/passedGate" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reference"],
+      "properties": {
+        "status": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "reference": { "type": ["null", "string"], "minLength": 1 }
+      }
+    },
+    "passedGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reference"],
+      "properties": {
+        "status": { "const": "PASS" },
+        "reference": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

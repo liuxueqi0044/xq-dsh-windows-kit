@@ -1,0 +1,4 @@
+Authorization: Bearer FAKE_TEST_BEARER_123456789
+api_key=sk-FAKE_TEST_123456789
+jwt=eyJmYWtlX3Rlc3Q.eyJzdWJqZWN0X2NhbmFyeQ.fake_signature
+https://user:FAKE_TEST_PASSWORD@example.invalid/?token=FAKE_TEST_URL_TOKEN

@@ -1,0 +1,15 @@
+# XQ's final DSH overlay. It is applied after the user's profile and home
+# patches, so those layers cannot widen this launch's workspace or approval
+# policy. The launcher also validates this file before it starts DSH.
+- id: sandbox-policy
+  config:
+    mode: workspace-write
+    workspaceRoot: !!js process.cwd()
+
+- id: approval
+  config:
+    policy: ask
+
+- id: fs-sandbox
+  config:
+    cwd: !!js process.cwd()

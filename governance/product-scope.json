@@ -1,0 +1,7 @@
+{
+  "$schema": "../schemas/product-scope.schema.json",
+  "supportedOperatingSystems": ["Windows 11"],
+  "supportedArchitectures": ["x64"],
+  "distributionIncludesPluginInstaller": false,
+  "claims": { "securityAudit": "not-claimed", "sandbox": "partial-restriction", "publicService": "not-provided" }
+}

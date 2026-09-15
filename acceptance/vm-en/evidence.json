@@ -1,0 +1,167 @@
+{
+  "$schema": "../evidence-schema.json",
+  "schemaVersion": "1",
+  "suiteId": "vm-en",
+  "status": "PENDING",
+  "environment": {
+    "vmId": "PENDING",
+    "locale": "en-US",
+    "osCaption": "PENDING",
+    "osBuild": "PENDING",
+    "architecture": "x64",
+    "snapshotId": "PENDING",
+    "isolated": false
+  },
+  "product": {
+    "productVersion": "1.0.0",
+    "dshVersion": "0.1.1-rc.2",
+    "candidateZipSha256": null
+  },
+  "startedAtUtc": null,
+  "endedAtUtc": null,
+  "executor": null,
+  "reviewer": null,
+  "privacyAttestation": false,
+  "items": [
+    {
+      "id": "VM-001",
+      "status": "PENDING",
+      "expected": "Chinese and English VMs have independent evidence",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-002",
+      "status": "PENDING",
+      "expected": "Clean Windows 11 x64 and supported Node flow passes",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-003",
+      "status": "PENDING",
+      "expected": "Locked DSH starts from the official source",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-004",
+      "status": "PENDING",
+      "expected": "First workspace is empty and narrowly scoped",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-005",
+      "status": "PENDING",
+      "expected": "Temporary key is entered by tester and absent from evidence",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-006",
+      "status": "PENDING",
+      "expected": "Low-risk task passes with workspace-write and ask",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-007",
+      "status": "PENDING",
+      "expected": "Port 3080 listens only on 127.0.0.1 with IPv4/IPv6 recorded",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-008",
+      "status": "PENDING",
+      "expected": "Restart data behavior matches the guide",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-009",
+      "status": "PENDING",
+      "expected": "API, port, network and download failures are friendly",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-010",
+      "status": "PENDING",
+      "expected": "Test Skill install, discovery, invocation and removal pass",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-011",
+      "status": "PENDING",
+      "expected": "Test plugin install, validation, removal and rollback pass",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-012",
+      "status": "PENDING",
+      "expected": "Diagnostic report passes automatic and human secret review",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-013",
+      "status": "PENDING",
+      "expected": "Final ZIP scan, hash and inventory agree",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    },
+    {
+      "id": "VM-014",
+      "status": "PENDING",
+      "expected": "Product claims, support scope and known issues pass review",
+      "actual": null,
+      "evidenceHashes": [],
+      "notes": "",
+      "command": null,
+      "evidenceFiles": []
+    }
+  ]
+}

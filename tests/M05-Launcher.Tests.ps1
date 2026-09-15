@@ -13,11 +13,65 @@ if (-not (Test-Path -LiteralPath $launcher)) {
   $source = Get-Content -LiteralPath $launcher -Raw
   $unsafe = '(?i)(Invoke-Expression|cmd\s*/c|schtasks|New-Service|sc\.exe\s+create|Register-ScheduledTask|New-NetFirewallRule|CurrentUser\\Run|RunOnce)'
   Check 'RUN-013' (-not ($source -match $unsafe)) 'No unsafe shell, service, task, firewall, or persistence keyword found' 'Unsafe shell or persistence keyword found'
+
+  # GitHub-hosted Windows runners use Windows Server, while the product correctly
+  # rejects anything except Windows 11 x64. Keep that production guard intact and
+  # shadow only Get-CimInstance inside a disposable child-process wrapper so the
+  # dry-run and cancellation branches remain testable on hosted CI.
+  $platformWrapper = $null
+  $launcherUnderTest = $launcher
+  try {
+    $hostOs = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop
+    $hostComputer = Get-CimInstance -ClassName Win32_ComputerSystem -ErrorAction Stop
+    $hostIsUnsupported = ($hostOs.Caption -notmatch 'Windows 11' -or [version]$hostOs.Version -lt [version]'10.0.22000.0' -or $hostComputer.SystemType -notmatch 'x64|64-bit')
+  } catch { $hostIsUnsupported = $true }
+  $requiresPlatformFixture = ($hostIsUnsupported -or $env:XQ_M05_FORCE_PLATFORM_FIXTURE -eq '1')
+  if ($requiresPlatformFixture) {
+    if ($hostIsUnsupported) {
+      $guardPath = Join-Path ([IO.Path]::GetTempPath()) ('xq-m05-platform-guard-' + [guid]::NewGuid().ToString('N'))
+      $guardOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $launcher -WorkspacePath $guardPath -ManifestPath (Join-Path $Root 'manifest\product-manifest.json') -WhatIf -Confirm:$false 2>&1)
+      $guardCode = $LASTEXITCODE
+      Check 'RUN-CI-PLATFORM-GUARD' (($guardCode -ne 0) -and (($guardOutput -join "`n") -match 'PLATFORM_(UNSUPPORTED|UNKNOWN)') -and (-not (Test-Path -LiteralPath $guardPath))) 'Unsupported CI host was rejected before the platform fixture was used' 'Production platform guard did not fail closed on the unsupported CI host'
+    }
+
+    $platformWrapper = Join-Path ([IO.Path]::GetTempPath()) ('xq-m05-platform-fixture-' + [guid]::NewGuid().ToString('N') + '.ps1')
+    $wrapperSource = @'
+[CmdletBinding()]
+param(
+  [Parameter(Mandatory=$true)][string]$LauncherPath,
+  [Parameter(Mandatory=$true)][string]$WorkspacePath,
+  [Parameter(Mandatory=$true)][string]$ManifestPath,
+  [switch]$WhatIf,
+  [string]$Confirm = 'true'
+)
+function Get-CimInstance {
+  [CmdletBinding()]
+  param([Parameter(Mandatory=$true)][string]$ClassName,[string]$Filter)
+  if ($ClassName -eq 'Win32_OperatingSystem') { return [pscustomobject]@{ Caption='Microsoft Windows 11 Pro'; Version='10.0.26100.0' } }
+  if ($ClassName -eq 'Win32_ComputerSystem') { return [pscustomobject]@{ SystemType='x64-based PC' } }
+  throw ('Unexpected CIM query in CI platform fixture: ' + $ClassName)
+}
+& $LauncherPath -WorkspacePath $WorkspacePath -ManifestPath $ManifestPath -WhatIf:$WhatIf -Confirm $Confirm
+exit $LASTEXITCODE
+'@
+    [IO.File]::WriteAllText($platformWrapper,$wrapperSource,(New-Object Text.UTF8Encoding($false)))
+    $launcherUnderTest = $platformWrapper
+  }
+
+  function Get-XQLauncherArguments([string]$Workspace,[string]$ManifestPath,[switch]$DryRun) {
+    $arguments = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$launcherUnderTest)
+    if ($null -ne $platformWrapper) { $arguments += @('-LauncherPath',$launcher) }
+    $arguments += @('-WorkspacePath',$Workspace,'-ManifestPath',$ManifestPath)
+    if ($DryRun) { $arguments += @('-WhatIf','-Confirm:false') }
+    return @($arguments)
+  }
+
   $whatIfPath = Join-Path ([IO.Path]::GetTempPath()) ('xq-m05-whatif-' + [guid]::NewGuid().ToString('N'))
   $manifest = Join-Path $Root 'manifest\product-manifest.json'
   $before = @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -match '^(npx|dsh)$' } | Select-Object -ExpandProperty Id)
   try {
-    $out = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $launcher -WorkspacePath $whatIfPath -ManifestPath $manifest -WhatIf -Confirm:$false 2>&1)
+    $whatIfArguments = @(Get-XQLauncherArguments -Workspace $whatIfPath -ManifestPath $manifest -DryRun)
+    $out = @(& powershell.exe @whatIfArguments 2>&1)
     $code = $LASTEXITCODE
     $after = @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -match '^(npx|dsh)$' } | Select-Object -ExpandProperty Id)
     $new = @($after | Where-Object { $before -notcontains $_ })
@@ -28,7 +82,8 @@ if (-not (Test-Path -LiteralPath $launcher)) {
   try {
     $m = Get-Content (Join-Path $Root 'manifest\product-manifest.json') -Raw | ConvertFrom-Json
     $m.upstream.packageName = 'evil/dsh'; [IO.File]::WriteAllText($tampered, ($m | ConvertTo-Json -Depth 20))
-    $out2 = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $launcher -WorkspacePath $whatIfPath -ManifestPath $tampered -WhatIf -Confirm:$false 2>&1)
+    $tamperedArguments = @(Get-XQLauncherArguments -Workspace $whatIfPath -ManifestPath $tampered -DryRun)
+    $out2 = @(& powershell.exe @tamperedArguments 2>&1)
     Check 'RUN-002' (($LASTEXITCODE -ne 0) -and (($out2 -join "`n") -match '(?i)(manifest|package|reject|invalid|block)')) 'Tampered manifest was rejected' 'Tampered manifest was not clearly rejected'
   } catch { Add-Result 'RUN-002' 'FAIL' ('Tampered manifest test failed: ' + $_.Exception.Message) }
   finally { if (Test-Path -LiteralPath $tampered) { Remove-Item -LiteralPath $tampered -Force -ErrorAction SilentlyContinue } }
@@ -36,7 +91,9 @@ if (-not (Test-Path -LiteralPath $launcher)) {
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = 'powershell.exe'; $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
     $psi.RedirectStandardInput = $true; $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true
-    $psi.Arguments = '-NoProfile -ExecutionPolicy Bypass -File "{0}" -WorkspacePath "{1}" -ManifestPath "{2}"' -f $launcher,$Workspace,$manifest
+    $childArguments = @(Get-XQLauncherArguments -Workspace $Workspace -ManifestPath $manifest)
+    if (@($childArguments | Where-Object { $_ -match '"' }).Count -gt 0) { throw 'A controlled test path unexpectedly contains a quote.' }
+    $psi.Arguments = @($childArguments | ForEach-Object { '"' + [string]$_ + '"' }) -join ' '
     $p = New-Object System.Diagnostics.Process; $p.StartInfo = $psi; [void]$p.Start(); $p.StandardInput.WriteLine($InputText); $p.StandardInput.Close()
     $stdout = $p.StandardOutput.ReadToEnd(); $stderr = $p.StandardError.ReadToEnd(); $p.WaitForExit(); [pscustomobject]@{ Code=$p.ExitCode; Output=($stdout + $stderr) }
   }
@@ -47,6 +104,7 @@ if (-not (Test-Path -LiteralPath $launcher)) {
   try { $beforeText = [IO.File]::ReadAllText($marker); $ne = Invoke-SafeChild $nonEmpty ''; $afterText = [IO.File]::ReadAllText($marker); Check 'RUN-005-nonempty' (($ne.Code -ne 0) -and ($beforeText -eq $afterText)) 'Non-empty workspace was rejected without content change' 'Non-empty workspace was not safely rejected' } finally { Remove-Item -LiteralPath $nonEmpty -Recurse -Force -ErrorAction SilentlyContinue }
   $cancelPath = Join-Path ([IO.Path]::GetTempPath()) ('xq-m05-cancel-' + [guid]::NewGuid().ToString('N')); $cancel = Invoke-SafeChild $cancelPath 'NO'
   Check 'RUN-012' (($cancel.Code -ne 0) -and ($cancel.Output -match 'USER_CANCELLED') -and (-not (Test-Path $cancelPath))) 'Cancellation returned USER_CANCELLED with no workspace creation' 'Cancellation contract failed'
+  if ($null -ne $platformWrapper -and (Test-Path -LiteralPath $platformWrapper -PathType Leaf)) { Remove-Item -LiteralPath $platformWrapper -Force -ErrorAction SilentlyContinue }
 }
 $results
 $blocking = @($results | Where-Object { $_.Status -eq 'FAIL' }).Count -gt 0

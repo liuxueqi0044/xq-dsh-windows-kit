@@ -13,7 +13,7 @@ Import-Module (Join-Path $PSScriptRoot '..\lib\XQDSH.Common.psm1') -Force
 function Add-XQResult { param($Result) $script:Results += $Result }
 function Get-XQVersionResult {
     param([string]$Name)
-    $info = Get-XQCommandInfo -Name $Name -Arguments @('--version') -TimeoutSeconds 8
+    $info = Get-XQCommandInfo -Name $Name -Arguments @('--version') -TimeoutSeconds 30
     if (-not $info.Passed) { return New-XQCheckResult $false 'BLOCKER' ($Name.ToUpperInvariant() + '_MISSING') ($Name + ' is required but unavailable.') $info.Evidence }
     $match = [regex]::Match([string]$info.Evidence.Output, '[vV]?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?')
     if (-not $match.Success) { return New-XQCheckResult $false 'BLOCKER' ($Name.ToUpperInvariant() + '_VERSION_UNKNOWN') ($Name + ' returned no recognizable version.') $info.Evidence }
@@ -44,7 +44,7 @@ try {
     $pnpm = Get-XQVersionResult 'pnpm'; if ($pnpm.Passed) { Add-XQResult $pnpm } else { Add-XQResult (New-XQCheckResult $true 'WARNING' 'PNPM_MISSING' 'pnpm is optional and unavailable.' $pnpm.Evidence) }
 
     Add-XQResult (Get-XQPortState -Port 3080)
-    $dsh = Get-XQCommandInfo -Name 'dsh' -Arguments @('--version') -TimeoutSeconds 8
+    $dsh = Get-XQCommandInfo -Name 'dsh' -Arguments @('--version') -TimeoutSeconds 30
     if ($dsh.Passed) { Add-XQResult (New-XQCheckResult $true 'INFO' 'DSH_FOUND' 'dsh command is available.' $dsh.Evidence) } else { Add-XQResult (New-XQCheckResult $true 'WARNING' 'DSH_NOT_FOUND' 'dsh command is not currently found; it is not installed by this checker.' $dsh.Evidence) }
     # Do not invoke npm cache commands: newer npm versions reject "cache dir" and write a log
     # for that rejected command.  The standard Windows cache path can be inspected as metadata.

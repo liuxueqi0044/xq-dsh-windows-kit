@@ -139,14 +139,16 @@ try {
     if (-not $workspace.Passed) { Stop-XQLaunch $script:ExitBlocked $workspace.Code $workspace.Message }
     $workspaceFull = $workspace.Evidence.Path
 
-    $nodeInfo = Get-XQCommandInfo -Name 'node' -Arguments @('--version') -TimeoutSeconds 8
+    # A cold npm shim on hosted Windows can take longer than eight seconds to
+    # initialize. The probe is read-only and remains bounded.
+    $nodeInfo = Get-XQCommandInfo -Name 'node' -Arguments @('--version') -TimeoutSeconds 30
     if (-not $nodeInfo.Passed) { Stop-XQLaunch $script:ExitBlocked 'NODE_MISSING' 'A supported Node.js installation is required.' }
     $versionMatch = [regex]::Match([string]$nodeInfo.Evidence.Output, '[vV]?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?')
     if (-not $versionMatch.Success -or -not (Test-XQSupportedNodeVersion -VersionText $versionMatch.Value -SupportedRange ([string]$manifest.runtime.nodeRange)).Passed) {
         Stop-XQLaunch $script:ExitBlocked 'NODE_VERSION_UNSUPPORTED' 'Node.js must be 22.19+ in major 22, or major 24 LTS.'
     }
     foreach ($tool in @('npm','npx')) {
-        $toolInfo = Get-XQCommandInfo -Name $tool -Arguments @('--version') -TimeoutSeconds 8
+        $toolInfo = Get-XQCommandInfo -Name $tool -Arguments @('--version') -TimeoutSeconds 30
         if (-not $toolInfo.Passed) { Stop-XQLaunch $script:ExitBlocked ($tool.ToUpperInvariant() + '_MISSING') ($tool + ' is required and could not be queried.') }
     }
 

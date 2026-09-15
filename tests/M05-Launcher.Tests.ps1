@@ -86,7 +86,15 @@ exit $LASTEXITCODE
     $code = $LASTEXITCODE
     $after = @(Get-XQDSHProcessIds)
     $new = @($after | Where-Object { $before -notcontains $_ })
-    Check 'RUN-004' (($code -eq 0) -and ($new.Count -eq 0) -and (($out -join "`n") -match '(?i)(what.?if|plan|would)')) 'WhatIf succeeded with a plan and no DSH/npx process' 'WhatIf did not produce a safe plan or spawned a process'
+    $planText = $out -join "`n"
+    $planMatched = $planText -match '(?i)(what.?if|plan|would)'
+    if (($code -eq 0) -and ($new.Count -eq 0) -and $planMatched) {
+      Add-Result 'RUN-004' 'PASS' 'WhatIf succeeded with a plan and no DSH/npx process'
+    } else {
+      $signals = @([regex]::Matches($planText,'\[(?<code>[A-Z0-9_-]+)\]') | ForEach-Object { $_.Groups['code'].Value } | Select-Object -Unique) -join ','
+      if ([string]::IsNullOrWhiteSpace($signals)) { $signals = 'none' }
+      Add-Result 'RUN-004' 'FAIL' ('WhatIf contract failed: exitCode={0}; planMatched={1}; newDshProcesses={2}; signals={3}' -f $code,$planMatched,$new.Count,$signals)
+    }
   } catch { Add-Result 'RUN-004' 'FAIL' ('WhatIf invocation failed: ' + $_.Exception.Message) }
   # An altered copy is supplied only as a temporary test input; it is never downloaded or executed.
   $tampered = Join-Path ([IO.Path]::GetTempPath()) ('xq-m05-tampered-' + [guid]::NewGuid().ToString('N') + '.json')
